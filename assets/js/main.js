@@ -164,15 +164,8 @@ function getEventElement(e){
 
 function debugFunc(e){
     var d = getEventElement(e);
-    //alert(d.id);
-    //var node = document.createElement("p");   
-    //var textnode = document.createTextNode("Event ID: "+eventNum+"; Type: "+e.type+"; X: "+e.clientX+"; Y: "+e.clientY+"; WW: "+winScW+"; WH: "+winScH+"; El.id: "+d.id+"; El.class: "+d.classList+"; El.tagName: "+d.tagName+"; TimeStamp:"+getCurrentTime()+";");
-    addLogItem("Event ID: "+eventNum+"; Type: "+e.type+"; X: "+e.clientX+"; Y: "+e.clientY+"; WW: "+winScW+"; WH: "+winScH+"; El.id: "+d.id+"; El.class: "+d.classList+"; El.tagName: "+d.tagName+"; TimeStamp:"+getCurrentTime()+";" )
-    //node.classList.add('eventLogItem');
-    //node.appendChild(textnode);         
-    putDot(e, eventNum);           
-    //document.querySelector("#events_log").appendChild(node);  
-    //bottttt
+    addLogItem("Ev.id: "+eventNum+"; Type: "+e.type+"; X: "+e.clientX+"; Y: "+e.clientY+"; WW: "+winScW+"; WH: "+winScH+"; El.id: "+d.id+"; El.class: "+d.classList+"; El.tagName: "+d.tagName+"; TimeStamp:"+getCurrentTime()+";" );     
+    putDot(e, eventNum);   
     var helperString = "";
     for (i in menuObj.menus) {
        
@@ -187,7 +180,6 @@ function debugFunc(e){
         helperString += "</div>";
     }
     document.querySelector('.menusObjectPrint').innerHTML = helperString;
-    //document.querySelector('.menusObjectPrint').innerHTML = JSON.stringify(menuObj);
 }
 
 function addLogItem(data, error = null){
@@ -268,18 +260,14 @@ function removeMenu(name){
 }
 
 function deleteLogItem(params){
-    //alert(params);
-    //document.querySelector('.selected[data-event-id="'+params+'"]').style.height = parseInt( document.querySelector('.selected[data-event-id="'+params+'"]').offsetHeight );
-    //document.querySelector('.selected[data-event-id="'+params+'"]').style.transition = "0.5s linear all";
     var elem = document.querySelector('.selected[data-event-id="'+params+'"]');
-        //elem.style.opacity = "0";
-        elem.style.padding = "2px";
-        elem.style.height = "10px";
-        elem.style.fontSize = "8px";
-        elem.style.background = "rgba(250, 10, 10, 0.5)";
-        elem.innerHTML = "Deleting...";
-        addLogItem("Successfully remove logItem id: "+ params, "success");
-        setTimeout(function(){ elem.remove(); }, 1000);
+    elem.style.padding = "2px";
+    elem.style.height = "10px";
+    elem.style.fontSize = "8px";
+    elem.style.background = "rgba(250, 10, 10, 0.5)";
+    elem.innerHTML = "Deleting...";
+    addLogItem("Successfully remove logItem id: "+ params, "success");
+    setTimeout(function(){ elem.remove(); }, 1000);
     
 }
 
@@ -307,6 +295,7 @@ function getCurrentTime(){
     var value =  hr + ":" + min +":"+ mil + ampm + " " + date + " " + month + " " + year;
     return value;
 }
+
 //Events
 window.addEventListener("resize", getWindowSize);
 
@@ -325,46 +314,35 @@ window.addEventListener("contextmenu", function(e){
     showContextMenu(e);
 }, false);
 
-
 //END Events
 
 //DEBUG init
 if (!(typeof debug === "undefined"))  {
     if (debug != false){
-    
         window.addEventListener("mousemove",moveMouseDebug);
-        /*
-        window.addEventListener("scroll", function(e) {
-            if((!(typeof debug === "undefined")) && (debug!==false)){debugFunc(e);};
-        });
-        */
-    
         var debugSide = document.createElement("DIV");   // Create a <button> element
         debugSide.innerHTML = "<a class='debug_toggler' onclick='toggleDebugSide()' title='Toggle Debug'>>></a><div class='debug_inner'><h2>Debug Info </h2><div id='events_log' ></div><div class='menusObjectPrint'></div></div>";  
         debugSide.setAttribute("id", "debug_side");
         document.body.appendChild(debugSide);  
-        
         test_add();
-
-    }
-}
+    };
+};
 
 
 //TEST FUNCTION
 function test_func(e){
     alert(e.target.innerHTML);
-}
-
+};
 
 function test_remove(){
     removeMenu('eventLogItem');
-}
+};
+
 function test_removeEE(){
     removeMenu('first');
-}
+};
 
 function test_add(){
-    
 
     var customMenu = {  "name":"eventLogItem", 
                         "items":[{  "name":"Show More Info", 
@@ -382,16 +360,16 @@ function test_add(){
                                 }]
                             };
     addNewMenu(customMenu);
-}
+};
 
 function clearEventLog(){
     document.querySelector('#events_log').innerHTML = "";
-}
+};
 
 function deleteEventLogItem(){
     var helperElem = document.querySelector('.selected').dataset.eventId;
     deleteLogItem(helperElem);
-}
+};
 
 
 function toggleDebugSide(){
@@ -402,5 +380,5 @@ function toggleDebugSide(){
     } else {
         helperElem.classList.add('open');
         document.querySelector('.debug_toggler').innerHTML = "<<";
-    }
-}
+    };
+};
