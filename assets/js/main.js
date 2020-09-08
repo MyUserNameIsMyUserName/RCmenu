@@ -68,15 +68,22 @@ menuObj = {
 
 function showContextMenu(e){
     e.preventDefault();
-    if((debug!== undefined) && (debug!==false)){debugFunc(e);};
+    if((!(typeof debug === "undefined"))){
+        if (debug !== false){
+            debugFunc(e);
+        };
+    };
 
     removeContextMenu();
     x = "";
     var d = getEventElement(e);
     for (i in menuObj.menus) {
         if ((d.id == menuObj.menus[i].name) || (d.classList.contains(menuObj.menus[i].name)) || (d.tagName == menuObj.menus[i].name.toUpperCase())){
-            if (debug=="full-with-menu-title"){
-                x += "<button disabled class='titleMenu'>" + menuObj.menus[i].name + "</button>";
+            
+            if (!(typeof debug === "undefined"))  {
+                if (debug=="full-with-menu-title"){
+                    x += "<button disabled class='titleMenu'>" + menuObj.menus[i].name + "</button>";
+                }
             }
             for (j in menuObj.menus[i].items) {
                 var status = "";
@@ -307,7 +314,11 @@ window.addEventListener("click", function(e) {
     if (!e.target.classList.contains('customMenu')){
         removeContextMenu();
     }
-    if((debug!== undefined) && (debug!==false)){debugFunc(e);};
+    if(!(typeof debug === "undefined")){
+        if (debug !== false){
+            debugFunc(e);
+        };
+    };
 });
 
 window.addEventListener("contextmenu", function(e){
@@ -318,21 +329,24 @@ window.addEventListener("contextmenu", function(e){
 //END Events
 
 //DEBUG init
-if ((debug!== undefined) && (debug!==false)) {
+if (!(typeof debug === "undefined"))  {
+    if (debug != false){
     
-    window.addEventListener("mousemove",moveMouseDebug);
-    /*
-    window.addEventListener("scroll", function(e) {
-        if((debug!== undefined) && (debug!==false)){debugFunc(e);};
-    });
-    */
+        window.addEventListener("mousemove",moveMouseDebug);
+        /*
+        window.addEventListener("scroll", function(e) {
+            if((!(typeof debug === "undefined")) && (debug!==false)){debugFunc(e);};
+        });
+        */
+    
+        var debugSide = document.createElement("DIV");   // Create a <button> element
+        debugSide.innerHTML = "<a class='debug_toggler' onclick='toggleDebugSide()' title='Toggle Debug'>>></a><div class='debug_inner'><h2>Debug Info </h2><div id='events_log' ></div><div class='menusObjectPrint'></div></div>";  
+        debugSide.setAttribute("id", "debug_side");
+        document.body.appendChild(debugSide);  
+        
+        test_add();
 
-    var debugSide = document.createElement("DIV");   // Create a <button> element
-    debugSide.innerHTML = "<a class='debug_toggler' onclick='toggleDebugSide()' title='Toggle Debug'>>></a><div class='debug_inner'><h2>Debug Info </h2><div id='events_log' ></div><div class='menusObjectPrint'></div></div>";  
-    debugSide.setAttribute("id", "debug_side");
-    document.body.appendChild(debugSide);  
-    
-    test_add();
+    }
 }
 
 
