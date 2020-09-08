@@ -1,5 +1,5 @@
 // undefined, false, true, "full" and "full-nomovelog" debug modes
-var debug = 'full-nomovelog';
+var debug = 'full';
 var winScW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 var winScH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 var selected = '';
@@ -87,6 +87,15 @@ function showContextMenu(e){
             }
         }
     }
+
+    var clearSelect = document.querySelectorAll('*');
+    var index = 0, length = clearSelect.length;
+    for ( ; index < length; index++) {
+        clearSelect[index].classList.remove('selected');
+    }
+
+    e.target.classList.add('selected');
+
     var node = document.createElement("DIV");
     node.style.background = "blue";
     node.style.position = "absolute";
@@ -149,19 +158,13 @@ function getEventElement(e){
 function debugFunc(e){
     var d = getEventElement(e);
     //alert(d.id);
-    var node = document.createElement("p");   
-    if ((e.type == 'mousemove') && (debug !== 'full-nomovelog')) {
-        var textnode = document.createTextNode("Event: "+e.type+"; X: "+e.clientX+"; Y: "+e.clientY+"; WW: "+winScW+"; WH: "+winScH+"; El.id: "+d.id+"; El.class: "+d.classList+"; El.tagName: "+d.tagName+";");
-    } else {
-        var textnode = document.createTextNode("Event: "+e.type+"; X: "+e.clientX+"; Y: "+e.clientY+"; WW: "+winScW+"; WH: "+winScH+"; El.id: "+d.id+"; El.class: "+d.classList+"; El.tagName: "+d.tagName+";");
-    }
-    node.dataset.eventId = eventNum;
-    node.classList.add('eventLogItem');
-    node.appendChild(textnode);         
+    //var node = document.createElement("p");   
+    //var textnode = document.createTextNode("Event ID: "+eventNum+"; Type: "+e.type+"; X: "+e.clientX+"; Y: "+e.clientY+"; WW: "+winScW+"; WH: "+winScH+"; El.id: "+d.id+"; El.class: "+d.classList+"; El.tagName: "+d.tagName+"; TimeStamp:"+getCurrentTime()+";");
+    addLogItem("Event ID: "+eventNum+"; Type: "+e.type+"; X: "+e.clientX+"; Y: "+e.clientY+"; WW: "+winScW+"; WH: "+winScH+"; El.id: "+d.id+"; El.class: "+d.classList+"; El.tagName: "+d.tagName+"; TimeStamp:"+getCurrentTime()+";" )
+    //node.classList.add('eventLogItem');
+    //node.appendChild(textnode);         
     putDot(e, eventNum);           
-    eventNum = eventNum + 1;
-    document.querySelector("#events_log").appendChild(node);  
-
+    //document.querySelector("#events_log").appendChild(node);  
     //bottttt
     var helperString = "";
     for (i in menuObj.menus) {
@@ -188,13 +191,21 @@ function addLogItem(data, error = null){
     } else if (error == 'success'){
         node.style.color = "green";
     }
+    node.dataset.eventId = eventNum;
+    node.style.transition = "0.5s linear all";
+    node.style.opacity = "1";
+    node.style.overflow = "hidden";
+    node.style.display = "block";
     node.classList.add('eventLogItem');
     node.appendChild(textnode);
     document.querySelector("#events_log").appendChild(node);  
+    node.style.height = parseInt( node.offsetHeight );
+    eventNum = eventNum + 1;
 }
 
 function moveMouseDebug(e){
-    if(debug == "full"){debugFunc(e);};
+    if((debug == "full") && (!e.target.closest('#debug_side'))){debugFunc(e);};
+    
     if(e.target.classList.contains('eventLogItem')){    
         //debug = true;
         var elems = document.querySelectorAll('.eventDot');
@@ -249,6 +260,46 @@ function removeMenu(name){
     }
 }
 
+function deleteLogItem(params){
+    //alert(params);
+    //document.querySelector('.selected[data-event-id="'+params+'"]').style.height = parseInt( document.querySelector('.selected[data-event-id="'+params+'"]').offsetHeight );
+    //document.querySelector('.selected[data-event-id="'+params+'"]').style.transition = "0.5s linear all";
+    var elem = document.querySelector('.selected[data-event-id="'+params+'"]');
+        //elem.style.opacity = "0";
+        elem.style.padding = "2px";
+        elem.style.height = "10px";
+        elem.style.fontSize = "8px";
+        elem.style.background = "rgba(250, 10, 10, 0.5)";
+        elem.innerHTML = "Deleting...";
+        addLogItem("Successfully remove logItem id: "+ params, "success");
+        setTimeout(function(){ elem.remove(); }, 1000);
+    
+}
+
+function getCurrentTime(){
+    var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    var d = new Date();
+    var day = days[d.getDay()];
+    var hr = d.getHours();
+    var min = d.getMinutes();
+    var mil = d.getMilliseconds();
+    if (min < 10) {
+        min = "0" + min;
+    }
+    var ampm = "am";
+    if( hr > 12 ) {
+        hr -= 12;
+        ampm = "pm";
+    }
+    var date = d.getDate();
+    var month = months[d.getMonth()];
+    var year = d.getFullYear();
+    //var x = document.getElementById("time");
+    //x.innerHTML = day + " " + hr + ":" + min + ampm + " " + date + " " + month + " " + year;
+    var value =  hr + ":" + min +":"+ mil + ampm + " " + date + " " + month + " " + year;
+    return value;
+}
 //Events
 window.addEventListener("resize", getWindowSize);
 
@@ -264,16 +315,12 @@ window.addEventListener("contextmenu", function(e){
 }, false);
 
 
-
 //END Events
 
 //DEBUG init
 if ((debug!== undefined) && (debug!==false)) {
     
-    window.addEventListener("mousemove", function(e){
-        moveMouseDebug(e);    
-    });
-
+    window.addEventListener("mousemove",moveMouseDebug);
     /*
     window.addEventListener("scroll", function(e) {
         if((debug!== undefined) && (debug!==false)){debugFunc(e);};
@@ -281,17 +328,10 @@ if ((debug!== undefined) && (debug!==false)) {
     */
 
     var debugSide = document.createElement("DIV");   // Create a <button> element
-    debugSide.innerHTML = "<h2>Debug Info</h2><div id='events_log' style='height: 50%; width: 100%; overflow: hidden; overflow-y: scroll; display: block; background: rgba(0,0,0,0.25)'></div><div class='menusObjectPrint'></div>";  
+    debugSide.innerHTML = "<a onclick='toggleDebugSide()'>AA</a><div class='debug_inner'><h2>Debug Info </h2><div id='events_log' ></div><div class='menusObjectPrint'></div></div>";  
     debugSide.setAttribute("id", "debug_side");
-    debugSide.style.color = 'white';
-    debugSide.style.position = 'absolute';
-    debugSide.style.top = '0';
-    debugSide.style.left = '0';
-    debugSide.style.height = 'calc(100% - 20px)';
-    debugSide.style.width = '350px';
-    debugSide.style.padding = '10px';
-    debugSide.style.background = 'rgba(0,0,0,0.25)';
-    document.body.appendChild(debugSide);   
+    document.body.appendChild(debugSide);  
+    
     test_add();
 }
 
@@ -317,8 +357,11 @@ function test_add(){
                                     "func": "test_func",
                                     "status": "disabled"
                                 },
-                                {   "name":"Delete Event",
+                                {   "name":"Delete 'first' menu",
                                     "func": "test_removeEE"
+                                },
+                                {   "name":"Remove this event", 
+                                    "func": "deleteEventLogItem"
                                 },
                                 {   "name":"Remove this menu", 
                                     "func": "test_remove"
@@ -329,4 +372,19 @@ function test_add(){
 
 function clearEventLog(){
     document.querySelector('#events_log').innerHTML = "";
+}
+
+function deleteEventLogItem(){
+    var helperElem = document.querySelector('.selected').dataset.eventId;
+    deleteLogItem(helperElem);
+}
+
+
+function toggleDebugSide(){
+    var helperElem = document.querySelector('#debug_side');
+    if (helperElem.classList.contains('open')){
+        helperElem.classList.remove('open');
+    } else {
+        helperElem.classList.add('open');
+    }
 }
