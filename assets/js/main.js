@@ -1,4 +1,4 @@
-// undefined, false, true, "full" and "full-nomovelog" debug modes
+// undefined, false, true, "full", "full-with-menu-title" and "full-nomovelog" debug modes
 var debug = 'full';
 var winScW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 var winScH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
@@ -75,7 +75,7 @@ function showContextMenu(e){
     var d = getEventElement(e);
     for (i in menuObj.menus) {
         if ((d.id == menuObj.menus[i].name) || (d.classList.contains(menuObj.menus[i].name)) || (d.tagName == menuObj.menus[i].name.toUpperCase())){
-            if (debug=="full"){
+            if (debug=="full-with-menu-title"){
                 x += "<button disabled class='titleMenu'>" + menuObj.menus[i].name + "</button>";
             }
             for (j in menuObj.menus[i].items) {
@@ -328,7 +328,7 @@ if ((debug!== undefined) && (debug!==false)) {
     */
 
     var debugSide = document.createElement("DIV");   // Create a <button> element
-    debugSide.innerHTML = "<a onclick='toggleDebugSide()'>AA</a><div class='debug_inner'><h2>Debug Info </h2><div id='events_log' ></div><div class='menusObjectPrint'></div></div>";  
+    debugSide.innerHTML = "<a class='debug_toggler' onclick='toggleDebugSide()' title='Toggle Debug'>>></a><div class='debug_inner'><h2>Debug Info </h2><div id='events_log' ></div><div class='menusObjectPrint'></div></div>";  
     debugSide.setAttribute("id", "debug_side");
     document.body.appendChild(debugSide);  
     
@@ -384,7 +384,9 @@ function toggleDebugSide(){
     var helperElem = document.querySelector('#debug_side');
     if (helperElem.classList.contains('open')){
         helperElem.classList.remove('open');
+        document.querySelector('.debug_toggler').innerHTML = ">>";
     } else {
         helperElem.classList.add('open');
+        document.querySelector('.debug_toggler').innerHTML = "<<";
     }
 }

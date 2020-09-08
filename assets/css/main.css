@@ -23,7 +23,7 @@ div#debug_side.open {
     left: 0px;
 }
 
-div#debug_side a{
+div#debug_side .debug_toggler{
     position: absolute;
     top: 0px;
     background: rgba(0,0,0,0.5);
@@ -34,9 +34,15 @@ div#debug_side a{
     align-items: center;
     display: flex;
     right: -40px;
+    cursor: pointer;
 }
-
-div#debug_side.open a{
+div#debug_side .debug_toggler:hover {
+    background: rgba(0,0,0,0.65);
+}
+div#debug_side .debug_toggler:active {
+    background: rgba(0,0,0,0.85);
+}
+div#debug_side.open .debug_toggler{
     right: 0px;
     transition: 0.25s ease all;
 }
