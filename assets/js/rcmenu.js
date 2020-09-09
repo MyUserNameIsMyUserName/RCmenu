@@ -7,7 +7,6 @@ var eventNum = 0;
 var logObj = {
         "logItems": []
     };
-var eventTime = new Date();
 var menuObj, i, j, x ,eventTimeHelper  = "";
 menuObj = {
     "menus": [{ "name":"body", 
@@ -168,6 +167,7 @@ function getEventElement(e){
 
 function debugFunc(e){
     var d = getEventElement(e);
+    var eventTime = new Date();
     eventTimeHelper = eventTime.getTime();
     var logObjData = {  "id":   eventNum, 
                         "type": e.type,
@@ -335,7 +335,9 @@ function downloadLog(content, fileName, contentType) {
     var a = document.createElement("a");
     var file = new Blob([JSON.stringify(content)], {type: contentType});
     a.href = URL.createObjectURL(file);
-    a.download = fileName;
+    var eventTime = new Date();
+    eventTimeHelper = eventTime.getTime();
+    a.download = fileName+'_'+eventTimeHelper+'.json.txt';
     a.click();
 }
 
@@ -365,7 +367,7 @@ if (!(typeof debugRCmenu === "undefined"))  {
     if (debugRCmenu != false){
         window.addEventListener("mousemove",moveMouseDebug);
         var debugSide = document.createElement("DIV");   // Create a <button> element
-        debugSide.innerHTML = "<a class='debug_toggler' onclick='toggleDebugSide()' title='Toggle Debug'>>></a><div class='debug_inner'><h2>Debug Info </h2><div class='optionsDebugLog'><button onclick='clearEventLog()'>Clear Event Log</button><button onclick='consoleLogObject()'>Console.log( logObj )</button><button onclick=\"downloadLog( logObj, 'logObj.json.txt', 'text/plain')\">Download Log</button></div><div id='events_log' ></div><div class='menusObjectPrint'></div></div>";  
+        debugSide.innerHTML = "<a class='debug_toggler' onclick='toggleDebugSide()' title='Toggle Debug'>>></a><div class='debug_inner'><h2>Debug Info </h2><div class='optionsDebugLog'><button onclick='clearEventLog()'>Clear Event Log</button><button onclick='consoleLogObject()'>Console.log( logObj )</button><button onclick=\"downloadLog( logObj, 'rcmenu-log', 'text/plain')\">Download Log</button></div><div id='events_log' ></div><div class='menusObjectPrint'></div></div>";  
         debugSide.setAttribute("id", "debug_side");
         document.body.appendChild(debugSide);  
         test_add();
