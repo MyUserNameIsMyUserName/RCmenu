@@ -2,6 +2,8 @@ html ,body {
     padding: 0;
     margin: 0;
     font-family: monospace;
+    color: #039BE5;
+    cursor: none;
 }
 
 p {
@@ -33,8 +35,7 @@ div#debug_side .debug_toggler{
     justify-content:center;
     align-items: center;
     display: flex;
-    right: -40px;
-    cursor: pointer;
+    right: -40px; 
 }
 div#debug_side .debug_toggler:hover {
     background: rgba(0,0,0,0.65);
@@ -60,8 +61,7 @@ div#debug_side .debug_inner {
 
 p.eventLogItem {
     background: rgba(0, 0, 0, 0.5);
-    padding: 2px 5px;
-    cursor: context-menu;
+    padding: 2px 5px; 
      border-left: 2px solid transparent; 
 }
 
@@ -88,3 +88,87 @@ div#events_log {
     padding: 2px 5px;
     margin: 2px 0;
 }
+
+.customMenu button {
+    padding: 5px 10px;
+    font-size: 14px;
+    color:white;
+    border-bottom: 1px solid gray;
+    background: #444;
+    outline: none;
+    border: none;
+}
+
+.customMenu button.disabled {
+    background: #585858;
+    color: #ababab;
+    pointer-events: all;
+}
+.customMenu button:not(.disabled):hover {
+    background: #039BE5;
+    color: black;
+}
+
+
+/******custom cursor*********/
+
+button, a {
+    cursor: none;
+}
+
+#customCursor {
+    position: absolute;
+    pointer-events: none;
+    z-index: 99999999;
+}
+
+
+.svg-2.clicking path {
+    d: path("M1,2 L9,16 C 9 16, 20 20, 16.5 8 L16.5,8 L1,2");
+  }
+
+.svg-2.clicking ellipse{
+    rx: 3.5;
+    ry: 3.5;
+    cx: 12.5;
+    cy: 12;
+    stroke: #4c4c4c;
+    transform-origin: calc(50% + 2.5px) calc(50% + 2px);
+    animation: mymove 2.5s infinite linear;
+    stroke-dasharray: 2, 1, 2, 1, 2, 1;
+}
+
+
+  
+svg polyline,
+svg line,
+svg path {
+  fill: none;
+  stroke: #000;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  -webkit-transition: 0.1s;
+  transition: 0.1s;
+}
+#customCursor path.outline {
+  fill : rgba(3, 169, 244, 0.25);
+}
+
+#customCursor.clicking path.outline {
+    fill: black;
+    stroke: #03A9F4;
+}
+
+#customCursor.clicking ellipse#svg_14 {
+    cx: 12.5;
+    cy: 12;
+    ry: 5;
+    rx: 5;
+}
+
+
+
+@keyframes mymove {
+  100% {transform: rotate(360deg);}
+}
+/****************************/

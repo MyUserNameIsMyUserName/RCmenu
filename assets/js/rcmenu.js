@@ -1,10 +1,14 @@
 // undefined, false, true, "full", "full-with-menu-title" and "full-nomovelog" debug modes
-var debug = 'full';
+var debugRCmenu = 'full-nomovelog';
 var winScW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 var winScH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 var selected = '';
 var eventNum = 0;
-var menuObj, i, j, x  = "";
+var logObj = {
+        "logItems": []
+    };
+var eventTime = new Date();
+var menuObj, i, j, x ,eventTimeHelper  = "";
 menuObj = {
     "menus": [{ "name":"body", 
                 "items":[{  "name":"First Item", 
@@ -68,8 +72,8 @@ menuObj = {
 
 function showContextMenu(e){
     e.preventDefault();
-    if((!(typeof debug === "undefined"))){
-        if (debug !== false){
+    if((!(typeof debugRCmenu === "undefined"))){
+        if (debugRCmenu !== false){
             debugFunc(e);
         };
     };
@@ -80,17 +84,17 @@ function showContextMenu(e){
     for (i in menuObj.menus) {
         if ((d.id == menuObj.menus[i].name) || (d.classList.contains(menuObj.menus[i].name)) || (d.tagName == menuObj.menus[i].name.toUpperCase())){
             
-            if (!(typeof debug === "undefined"))  {
-                if (debug=="full-with-menu-title"){
-                    x += "<button disabled class='titleMenu'>" + menuObj.menus[i].name + "</button>";
+            if (!(typeof debugRCmenu === "undefined"))  {
+                if (debugRCmenu =="full-with-menu-title"){
+                    x += "<button class='titleMenu disabled'>" + menuObj.menus[i].name + "</button>";
                 }
             }
             for (j in menuObj.menus[i].items) {
-                var status = "";
                 if (menuObj.menus[i].items[j].status !== undefined){
-                    status = 'disabled';
+                    x += "<button class='disabled'>" + menuObj.menus[i].items[j].name + "</button>";
+                } else {
+                    x += "<button onclick='"+menuObj.menus[i].items[j].func+"(event)' class='"+status+"'>" + menuObj.menus[i].items[j].name + "</button>";
                 }
-                x += "<button onclick='"+menuObj.menus[i].items[j].func+"(event)' "+status+">" + menuObj.menus[i].items[j].name + "</button>";
             }
         }
     }
@@ -164,8 +168,22 @@ function getEventElement(e){
 
 function debugFunc(e){
     var d = getEventElement(e);
+    eventTimeHelper = eventTime.getTime();
+    var logObjData = {  "id":   eventNum, 
+                        "type": e.type,
+                        "clientX": e.clientX,
+                        "clientY": e.clientY,
+                        "winWidth": winScW,
+                        "winHeight": winScH,
+                        "elid": d.id,
+                        "elclass": d.classList,
+                        "eltag": d.tagName,
+                        "timeStamp": eventTimeHelper,
+                        "timeStampFormated": getCurrentTime(),
+                            };
+    addToLogList(logObjData);
     addLogItem("Ev.id: "+eventNum+"; Type: "+e.type+"; X: "+e.clientX+"; Y: "+e.clientY+"; WW: "+winScW+"; WH: "+winScH+"; El.id: "+d.id+"; El.class: "+d.classList+"; El.tagName: "+d.tagName+"; TimeStamp:"+getCurrentTime()+";" );     
-    putDot(e, eventNum);   
+    putDot(e);   
     var helperString = "";
     for (i in menuObj.menus) {
        
@@ -182,7 +200,12 @@ function debugFunc(e){
     document.querySelector('.menusObjectPrint').innerHTML = helperString;
 }
 
+function addToLogList(data){
+    logObj.logItems.push(data);
+}
+
 function addLogItem(data, error = null){
+    eventNum = eventNum + 1;
     var node = document.createElement("p");     
     var textnode = document.createTextNode(data);
     if (error == 'error'){
@@ -199,14 +222,13 @@ function addLogItem(data, error = null){
     node.appendChild(textnode);
     document.querySelector("#events_log").appendChild(node);  
     node.style.height = parseInt( node.offsetHeight );
-    eventNum = eventNum + 1;
 }
 
 function moveMouseDebug(e){
-    if((debug == "full") && (!e.target.closest('#debug_side'))){debugFunc(e);};
+    if((debugRCmenu == "full") && (!e.target.closest('#debug_side'))){debugFunc(e);};
     
     if(e.target.classList.contains('eventLogItem')){    
-        //debug = true;
+        //debugRCmenu = true;
         var elems = document.querySelectorAll('.eventDot');
         var index = 0, length = elems.length;
         for ( ; index < length; index++) {
@@ -218,7 +240,7 @@ function moveMouseDebug(e){
         document.querySelector('.eventDot[data-event-id="'+e.target.dataset.eventId+'"]').style.opacity = "1";
         document.querySelector('.eventDot[data-event-id="'+e.target.dataset.eventId+'"]').style.transform = "scale(2.5)";
     } else {
-        //debug = "full";
+        //debugRCmenu = "full";
         var elems = document.querySelectorAll('.eventDot');
         var index = 0, length = elems.length;
         for ( ; index < length; index++) {
@@ -296,6 +318,28 @@ function getCurrentTime(){
     return value;
 }
 
+function clearEventLog(){
+    document.querySelector('#events_log').innerHTML = "";
+    var allDots = document.querySelectorAll('.eventDot');
+    var index = 0, length = allDots.length;
+    for ( ; index < length; index++) {
+        allDots[index].remove();
+    }
+}
+
+function consoleLogObject(){
+    console.log(JSON.stringify(logObj));
+}
+
+function downloadLog(content, fileName, contentType) {
+    var a = document.createElement("a");
+    var file = new Blob([JSON.stringify(content)], {type: contentType});
+    a.href = URL.createObjectURL(file);
+    a.download = fileName;
+    a.click();
+}
+
+
 //Events
 window.addEventListener("resize", getWindowSize);
 
@@ -303,8 +347,8 @@ window.addEventListener("click", function(e) {
     if (!e.target.classList.contains('customMenu')){
         removeContextMenu();
     }
-    if(!(typeof debug === "undefined")){
-        if (debug !== false){
+    if(!(typeof debugRCmenu === "undefined")){
+        if (debugRCmenu !== false){
             debugFunc(e);
         };
     };
@@ -317,11 +361,11 @@ window.addEventListener("contextmenu", function(e){
 //END Events
 
 //DEBUG init
-if (!(typeof debug === "undefined"))  {
-    if (debug != false){
+if (!(typeof debugRCmenu === "undefined"))  {
+    if (debugRCmenu != false){
         window.addEventListener("mousemove",moveMouseDebug);
         var debugSide = document.createElement("DIV");   // Create a <button> element
-        debugSide.innerHTML = "<a class='debug_toggler' onclick='toggleDebugSide()' title='Toggle Debug'>>></a><div class='debug_inner'><h2>Debug Info </h2><div id='events_log' ></div><div class='menusObjectPrint'></div></div>";  
+        debugSide.innerHTML = "<a class='debug_toggler' onclick='toggleDebugSide()' title='Toggle Debug'>>></a><div class='debug_inner'><h2>Debug Info </h2><div class='optionsDebugLog'><button onclick='clearEventLog()'>Clear Event Log</button><button onclick='consoleLogObject()'>Console.log( logObj )</button><button onclick=\"downloadLog( logObj, 'logObj.json.txt', 'text/plain')\">Download Log</button></div><div id='events_log' ></div><div class='menusObjectPrint'></div></div>";  
         debugSide.setAttribute("id", "debug_side");
         document.body.appendChild(debugSide);  
         test_add();
@@ -361,10 +405,7 @@ function test_add(){
                             };
     addNewMenu(customMenu);
 };
-
-function clearEventLog(){
-    document.querySelector('#events_log').innerHTML = "";
-};
+;
 
 function deleteEventLogItem(){
     var helperElem = document.querySelector('.selected').dataset.eventId;
