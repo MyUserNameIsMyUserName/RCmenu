@@ -10,25 +10,25 @@ var logObj = {
 var menuObj, i, j, x ,eventTimeHelper  = "";
 menuObj = {
     "menus": [{ "name":"body", 
-                "items":[{  "name":"First Item", 
+                "items":[{  "name":"<i class='fa fa-pencil' aria-hidden='true'></i> First Item", 
                             "func": "test_remove"
                         },
-                        {   "name":"TEAAA",
+                        {   "name":"<i class='fa fa-plus' aria-hidden='true'></i> TEAAA",
                             "func": "test_remove",
                             "status": "disabled"
                         },
-                        {   "name":"ZZZZZ", 
+                        {   "name":"<i class='fa fa-car' aria-hidden='true'></i> ZZZZZ", 
                             "func": "test_add"
                         }]
                     },
             {   "name":"first", 
-                "items":[{  "name":"First Item", 
+                "items":[{  "name":"<i class='fa fa-facebook' aria-hidden='true'></i> First Item", 
                             "func": "test_add"
                         },
-                        {   "name":"TEAAA",
+                        {   "name":"<i class='fa fa-twitter' aria-hidden='true'></i> TEAAA",
                             "func": "test_add"
                         },
-                        {   "name":"ZZZZZ", 
+                        {   "name":"<i class='fa fa-pencil' aria-hidden='true'></i> ZZZZZ", 
                             "func": "test_func",
                             "status": "disabled"
                         }]
@@ -90,48 +90,56 @@ function showContextMenu(e){
             }
             for (j in menuObj.menus[i].items) {
                 if (menuObj.menus[i].items[j].status !== undefined){
-                    x += "<button class='disabled'>" + menuObj.menus[i].items[j].name + "</button>";
+                    x += "<button class='disabled fancy-hover'>" + menuObj.menus[i].items[j].name + "</button>";
                 } else {
-                    x += "<button onclick='"+menuObj.menus[i].items[j].func+"(event)' class='"+status+"'>" + menuObj.menus[i].items[j].name + "</button>";
+                    x += "<button onclick='"+menuObj.menus[i].items[j].func+"(event)' class='"+status+" fancy-hover'>" + menuObj.menus[i].items[j].name + "</button>";
                 }
             }
+            
+            var node = document.createElement("DIV");
+            node.style.background = "blue";
+            node.style.position = "absolute";
+            node.style.display = "flex";
+            node.style.flexDirection = "column";
+            node.classList.add("customMenu");
+            document.querySelector("body").appendChild(node); 
+            node.innerHTML = x;
+            if ((e.clientY + window.pageYOffset + node.offsetHeight) > winScH ){
+                node.style.top = (e.clientY + window.pageYOffset - node.offsetHeight)+"px";
+            } else {
+                node.style.top = (e.clientY + window.pageYOffset)+"px";
+            };
+            if ((e.clientX + window.pageXOffset + node.offsetWidth) > winScW ){
+                node.style.left = (e.clientX + window.pageXOffset - node.offsetWidth)+"px";
+            } else {
+                node.style.left = (e.clientX + window.pageXOffset)+"px";
+            };
+            addMenuHoverAnimation();
         }
     }
 
-    var clearSelect = document.querySelectorAll('*');
-    var index = 0, length = clearSelect.length;
-    for ( ; index < length; index++) {
-        clearSelect[index].classList.remove('selected');
-    }
+    selectingItem(e);
 
-    e.target.classList.add('selected');
 
-    var node = document.createElement("DIV");
-    node.style.background = "blue";
-    node.style.position = "absolute";
-    node.style.display = "flex";
-    node.style.flexDirection = "column";
-    node.classList.add("customMenu");
-    document.querySelector("body").appendChild(node); 
-    node.innerHTML = x;
-    if ((e.clientY + window.pageYOffset + node.offsetHeight) > winScH ){
-        node.style.top = (e.clientY + window.pageYOffset - node.offsetHeight)+"px";
-    } else {
-        node.style.top = (e.clientY + window.pageYOffset)+"px";
-    };
-    if ((e.clientX + window.pageXOffset + node.offsetWidth) > winScW ){
-        node.style.left = (e.clientX + window.pageXOffset - node.offsetWidth)+"px";
-    } else {
-        node.style.left = (e.clientX + window.pageXOffset)+"px";
-    };
-}
+    
+};
 
 function removeContextMenu(){
     var exMenu = document.getElementsByClassName("customMenu");
     if(exMenu.length > 0){
         document.querySelector(".customMenu").remove();
     };
-}
+};
+
+function selectingItem(e){
+    var clearSelect = document.querySelectorAll('.selected');
+    var index = 0, length = clearSelect.length;
+    for ( ; index < length; index++) {
+        clearSelect[index].classList.remove('selected');
+    }
+
+    e.target.classList.add('selected');
+};
 
 function putDot(e){
     var node = document.createElement("p");
@@ -214,11 +222,11 @@ function addLogItem(data, error = null){
         node.style.color = "green";
     }
     node.dataset.eventId = eventNum;
-    node.style.transition = "0.5s linear all";
     node.style.opacity = "1";
     node.style.overflow = "hidden";
     node.style.display = "block";
     node.classList.add('eventLogItem');
+    node
     node.appendChild(textnode);
     document.querySelector("#events_log").appendChild(node);  
     node.style.height = parseInt( node.offsetHeight );
@@ -283,6 +291,7 @@ function removeMenu(name){
 
 function deleteLogItem(params){
     var elem = document.querySelector('.selected[data-event-id="'+params+'"]');
+    elem.classList.add('deleting');
     elem.style.padding = "2px";
     elem.style.height = "10px";
     elem.style.fontSize = "8px";
@@ -346,18 +355,25 @@ function downloadLog(content, fileName, contentType) {
 window.addEventListener("resize", getWindowSize);
 
 window.addEventListener("click", function(e) {
-    if (!e.target.classList.contains('customMenu')){
+    var parentHeleper = e.target.parentElement;
+    if ((!(e.target.classList.contains('customMenu') || parentHeleper.classList.contains('customMenu'))) || (parentHeleper.classList.contains('customMenu') && (!e.target.classList.contains('disabled')))){
         removeContextMenu();
-    }
+    } 
     if(!(typeof debugRCmenu === "undefined")){
         if (debugRCmenu !== false){
             debugFunc(e);
         };
     };
+    selectingItem(e)
 });
 
 window.addEventListener("contextmenu", function(e){
-    showContextMenu(e);
+    var parentHeleper = e.target.parentElement;
+    if ((!(e.target.classList.contains('customMenu') || parentHeleper.classList.contains('customMenu')))){
+        showContextMenu(e);
+    } else {
+        e.preventDefault();
+    }
 }, false);
 
 //END Events
@@ -391,17 +407,14 @@ function test_removeEE(){
 function test_add(){
 
     var customMenu = {  "name":"eventLogItem", 
-                        "items":[{  "name":"Show More Info", 
+                        "items":[{  "name":"<i class='fa fa-info' aria-hidden='true'></i> Show More Info", 
                                     "func": "test_func",
                                     "status": "disabled"
                                 },
-                                {   "name":"Delete 'first' menu",
-                                    "func": "test_removeEE"
-                                },
-                                {   "name":"Remove this event", 
+                                {   "name":"<i class='fa fa-trash' aria-hidden='true'></i> Remove this event", 
                                     "func": "deleteEventLogItem"
                                 },
-                                {   "name":"Remove this menu", 
+                                {   "name":"<i class='fa fa-close' aria-hidden='true'></i> Remove this menu", 
                                     "func": "test_remove"
                                 }]
                             };
@@ -425,3 +438,17 @@ function toggleDebugSide(){
         document.querySelector('.debug_toggler').innerHTML = "<<";
     };
 };
+
+function addMenuHoverAnimation(){
+    var helperNode = document.querySelector('.customMenu');
+    Array.from(
+        document.querySelectorAll('.fancy-hover'),
+        function(el){
+      
+          el.addEventListener('mousemove',function(e){
+            el.style.setProperty('--px', e.clientX - helperNode.offsetLeft - el.offsetLeft);
+            el.style.setProperty('--py', e.clientY - helperNode.offsetTop - el.offsetTop);
+          });
+      
+        });
+}
