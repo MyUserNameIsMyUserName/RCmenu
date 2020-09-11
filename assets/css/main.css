@@ -65,11 +65,16 @@ p.eventLogItem {
      border-left: 2px solid transparent; 
 }
 
-p.eventLogItem:hover {
+p.eventLogItem:hover, p.eventLogItem.selected {
     background: rgba(0, 0, 0, 0.75);
-    border-left: 2px solid green; 
+    border-left: 3px solid #0288D1; 
     transform: scale(1.025);
     transition: 0.15s ease all!important;
+    box-shadow: 0 0 15px #0288D1;
+}
+
+p.eventLogItem.deleting {
+    transition: all 0.5s linear 0s!important;
 }
 
 div#events_log {
@@ -78,10 +83,19 @@ div#events_log {
     width: calc(100% - 10px);
     overflow: hidden;
     overflow-y: scroll;
+    cursor: none;
     display: block;
     background: rgba(0,0,0,0.25);
 }
 
+div#events_log::-webkit-scrollbar {
+    display: none;
+}
+
+div#events_log {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
 
 .titleMenu {
     background: rgba(61, 129, 255, 0.16);

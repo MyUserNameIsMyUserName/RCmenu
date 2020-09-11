@@ -118,6 +118,20 @@ function showContextMenu(e){
         }
     }
 
+    selectingItem(e);
+
+
+    
+};
+
+function removeContextMenu(){
+    var exMenu = document.getElementsByClassName("customMenu");
+    if(exMenu.length > 0){
+        document.querySelector(".customMenu").remove();
+    };
+};
+
+function selectingItem(e){
     var clearSelect = document.querySelectorAll('.selected');
     var index = 0, length = clearSelect.length;
     for ( ; index < length; index++) {
@@ -125,16 +139,7 @@ function showContextMenu(e){
     }
 
     e.target.classList.add('selected');
-
-    
-}
-
-function removeContextMenu(){
-    var exMenu = document.getElementsByClassName("customMenu");
-    if(exMenu.length > 0){
-        document.querySelector(".customMenu").remove();
-    };
-}
+};
 
 function putDot(e){
     var node = document.createElement("p");
@@ -217,7 +222,6 @@ function addLogItem(data, error = null){
         node.style.color = "green";
     }
     node.dataset.eventId = eventNum;
-    node.style.transition = "0.5s linear all";
     node.style.opacity = "1";
     node.style.overflow = "hidden";
     node.style.display = "block";
@@ -287,6 +291,7 @@ function removeMenu(name){
 
 function deleteLogItem(params){
     var elem = document.querySelector('.selected[data-event-id="'+params+'"]');
+    elem.classList.add('deleting');
     elem.style.padding = "2px";
     elem.style.height = "10px";
     elem.style.fontSize = "8px";
@@ -350,18 +355,25 @@ function downloadLog(content, fileName, contentType) {
 window.addEventListener("resize", getWindowSize);
 
 window.addEventListener("click", function(e) {
-    if (!e.target.classList.contains('customMenu')){
+    var parentHeleper = e.target.parentElement;
+    if ((!(e.target.classList.contains('customMenu') || parentHeleper.classList.contains('customMenu'))) || (parentHeleper.classList.contains('customMenu') && (!e.target.classList.contains('disabled')))){
         removeContextMenu();
-    }
+    } 
     if(!(typeof debugRCmenu === "undefined")){
         if (debugRCmenu !== false){
             debugFunc(e);
         };
     };
+    selectingItem(e)
 });
 
 window.addEventListener("contextmenu", function(e){
-    showContextMenu(e);
+    var parentHeleper = e.target.parentElement;
+    if ((!(e.target.classList.contains('customMenu') || parentHeleper.classList.contains('customMenu')))){
+        showContextMenu(e);
+    } else {
+        e.preventDefault();
+    }
 }, false);
 
 //END Events
